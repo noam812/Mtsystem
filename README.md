@@ -1,6 +1,8 @@
 # Message Template Manager
 
 A full-stack application for managing message templates with Telegram bot integration.
+improvements that were made was adding openai gpt-4 to enhance ux with bot integration. 
++ started to integrate cicd pipeline.
 
 ## 🚀 Tech Stack
 
