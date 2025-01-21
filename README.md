@@ -120,7 +120,7 @@ The application should now be running:
 
          **- Book Recommendation: Here is a great book for yo**u...
      * **Message:** "I'm looking for a template related to books."
-       * **Bot Response:** "Here is a great book for you: [Book Details]"
+       * **Bot Response:** "Here is a great book for you"
 
 ### 4. Testing the Bot and API
 
