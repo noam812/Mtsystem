@@ -1,34 +1,16 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import MessageCard from "./MessageCard";
+import { useTemplates } from "../TemplateContext";
 
 const MessageList = () => {
-  const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { templates, loading, error, fetchTemplates } = useTemplates();
 
   useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/templates");
-        setTemplates(response.data);
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Failed to fetch templates");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTemplates();
-  }, []);
+  }, [fetchTemplates]);
 
-  if (loading) {
-    return <div className="loading-state">Loading templates...</div>;
-  }
-
-  if (error) {
-    return <div className="error-state">Error: {error}</div>;
-  }
+  if (loading) return <div className="loading-state">Loading templates...</div>;
+  if (error) return <div className="error-state">Error: {error}</div>;
 
   return (
     <div className="list-container">
@@ -40,15 +22,10 @@ const MessageList = () => {
         </div>
       </div>
       {templates.map((template) => (
-        <MessageCard
-          key={template._id}
-          template={template}
-          setTemplates={setTemplates}
-        />
+        <MessageCard key={template._id} template={template} />
       ))}
     </div>
   );
 };
-
 
 export default MessageList;

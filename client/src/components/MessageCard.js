@@ -1,31 +1,29 @@
 import React from "react";
-import axios from "axios";
+import { useTemplates } from "../TemplateContext";
 
-const MessageCard = ({ template, setTemplates }) => {
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:5000/api/templates/${template._id}`);
-      setTemplates((prevTemplates) =>
-        prevTemplates.filter((t) => t._id !== template._id)
-      );
-    } catch (error) {
-      console.error(error);
+const MessageCard = ({ template }) => {
+  const { updateTemplate, deleteTemplate } = useTemplates();
+
+  const handleEdit = async () => {
+    const updatedContent = prompt("Edit Template Content", template.content);
+    if (updatedContent) {
+      try {
+        await updateTemplate(template._id, {
+          ...template,
+          content: updatedContent,
+        });
+      } catch (error) {
+        console.error("Error updating template:", error);
+      }
     }
   };
 
-  const handleEdit = async () => {
-    const updatedTemplate = prompt("Edit Template Content", template.content);
-    if (updatedTemplate) {
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this template?")) {
       try {
-        const response = await axios.put(`/api/templates/${template._id}`, {
-          ...template,
-          content: updatedTemplate,
-        });
-        setTemplates((prevTemplates) =>
-          prevTemplates.map((t) => (t._id === template._id ? response.data : t))
-        );
+        await deleteTemplate(template._id);
       } catch (error) {
-        console.error("Error updating template:", error);
+        console.error("Error deleting template:", error);
       }
     }
   };

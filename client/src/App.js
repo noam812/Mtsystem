@@ -2,6 +2,7 @@ import React from "react";
 import MessageForm from "./components/MessageForm";
 import MessageList from "./components/MessageList";
 import { TemplateProvider } from "./TemplateContext";
+import "./App.css";
 
 function App() {
   return (

@@ -1,8 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { useTemplates } from "../TemplateContext";
 
 const MessageForm = () => {
+  const { addTemplate } = useTemplates();
   const {
     register,
     handleSubmit,
@@ -12,7 +13,7 @@ const MessageForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post(`http://localhost:5000/api/templates`, data);
+      await addTemplate(data);
       alert("Template created successfully!");
       reset();
     } catch (error) {
