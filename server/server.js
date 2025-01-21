@@ -1,9 +1,11 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const TelegramBot = require("node-telegram-bot-api");
-const cors = require("cors"); // Import cors
-// import OpenAI from "openai";
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import TelegramBot from "node-telegram-bot-api";
+import cors from "cors";
+import OpenAI from "openai";
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,10 +14,10 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+// mongoose
+//   .connect(process.env.MONGODB_URI)
+//   .then(() => console.log("Connected to MongoDB"))
+//   .catch((err) => console.error("MongoDB connection error:", err));
 
 // MongoDB Schema
 const templateSchema = new mongoose.Schema({
@@ -27,7 +29,7 @@ const Template = mongoose.model("Template", templateSchema);
 
 // // OpenAI setup
 
-// const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Telegram Bot
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
@@ -53,48 +55,52 @@ bot.onText(/\/templates/, async (msg) => {
   }
 });
 
-// bot.on("message", async (msg) => {
-//   if (msg.text && !msg.text.startsWith("/")) {
-//     // Only process regular messages
-//     try {
-//       const templatesData = await Template.find({}, "context _id");
-//       const contextMap = templatesData.reduce((map, t) => {
-//         map[t.context] = t._id;
-//         return map;
-//       }, {});
-//       if (templates.length > 0) {
-//         const prompt = `User message: ${
-//           msg.text
-//         }\nFind the most relevant template context:\n${contextMap
-//           .keys()
-//           .join(
-//             "\n"
-//           )}\nReturn only the most relevant context or "No match" if none is found.`;
+bot.on("message", async (msg) => {
+  if (msg.text && !msg.text.startsWith("/")) {
+    // Only process regular messages
+    try {
+        const templatesData = await Template.find({}, "context _id");
+        console.log(templatesData);
+      const contextMap = new Map(templatesData.map((t) => [t.context, t._id]));
+      console.log(Array.from(contextMap.keys()).join(", "));
+      if (templatesData.length > 0 && contextMap.size > 0) {
+        const prompt = `User message: ${
+          msg.text
+        }\nFind the most relevant template context: ${Array.from(
+          contextMap.keys()
+        ).join(
+          ", "
+        )} Return only the most relevant context or "No match" if none is found.`;
 
-//         const completion = await openai.createCompletion({
-//           model: "text-davinci-003",
-//           prompt: prompt,
-//           max_tokens: 50,
-//         });
-//         const matchedContext = completion.data.choices[0].text.trim();
+        console.log(prompt);
 
-//         if (matchedContext !== "No match" && contextMap[matchedContext]) {
-//           const matchedTemplate = templates.find(
-//             contextMap[matchedContext].get("_id")
-//           );
-//           bot.sendMessage(msg.chat.id, matchedTemplate.content);
-//         } else {
-//           bot.sendMessage(msg.chat.id, "No matching template found.");
-//         }
-//       } else {
-//         bot.sendMessage(msg.chat.id, "No templates available to match.");
-//       }
-//     } catch (error) {
-//       console.error("OpenAI or template processing error:", error);
-//       bot.sendMessage(msg.chat.id, "An error occurred.");
-//     }
-//   }
-// });
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 50,
+        });
+
+        const matchedContext = completion.choices[0].message.content.trim();
+        console.log(`match ${matchedContext}`);
+        console.log(contextMap.has(matchedContext));  
+
+        if (matchedContext !== "No match" && contextMap.has(matchedContext.toLowerCase())) {
+          const matchedTemplate = await Template.findById(
+            contextMap.get(matchedContext)
+          );
+          bot.sendMessage(msg.chat.id, matchedTemplate.content);
+        } else {
+          bot.sendMessage(msg.chat.id, "No matching template found.");
+        }
+      } else {
+        bot.sendMessage(msg.chat.id, "No templates available to match.");
+      }
+    } catch (error) {
+      console.error("OpenAI or template processing error:", error);
+      bot.sendMessage(msg.chat.id, "An error occurred.");
+    }
+  }
+});
 
 // API Routes
 app.get("/api/templates", async (req, res) => {
@@ -140,4 +146,14 @@ app.delete("/api/templates/:id", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+  }
+};
+
+startServer();

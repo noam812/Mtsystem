@@ -38,6 +38,7 @@ const MessageForm = () => {
         placeholder="Context"
         {...register("context", {
           required: "Context is required",
+          toLowerCase: true,
           minLength: {
             value: 5,
             message: "Context must be at least 5 characters",
