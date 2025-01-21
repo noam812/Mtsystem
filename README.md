@@ -71,6 +71,62 @@ The application should now be running:
 * **Client:** `http://localhost:3000`
 * **Server:** `http://localhost:5000`
 
+
+
+## 📱 How to Use in Development Mode
+
+### 1. Access the Client Application
+
+* Open your browser and navigate to `http://localhost:3000`.
+* You will see the Message Template Manager interface.
+
+### 2. Add Templates with Context
+
+* **Create a New Template:**
+  * Click on the "Add Template" button.
+  * Fill in the **Name** and **Context** fields.
+    * **Name:** A descriptive name for the template (e.g., "Book Recommendation").
+    * **Context:** A keyword or phrase related to the template (e.g., "books").
+  * Submit the form to save the template.
+* **Manage Existing Templates:**
+  * View the list of existing templates.
+  * Edit or delete templates as needed using the provided buttons.
+
+### 3. Interact with the Telegram Bot
+
+* **Start the Bot:**
+  * Open Telegram and search for your bot using its username.
+  * Click on **Start** to begin interacting with the bot.
+  * **Command:** `/start`
+    * **Response:** "Welcome to the Template Bot!"
+* **View Available Commands:**
+  * **Command:** `/templates`
+    * **Response:** Displays a list of all available templates with their names and contexts.
+* **Retrieve a Template Using Context:**
+  * Send a regular message that matches a template's context.
+    * **Example Message:** "I'm looking for a template related to books."
+    * **Response:** The bot will return the corresponding template if a matching context is found.
+* **Example Workflow:**
+  1. **Add a Template:**
+     * **Name:** Book Recommendation
+     * **Context:** books
+  2. **Use the Bot:**
+     * **Command:** `/templates`
+       * **Bot Response:**
+
+         **Available Templates:**
+
+         **- Book Recommendation: Here is a great book for yo**u...
+     * **Message:** "I'm looking for a template related to books."
+       * **Bot Response:** "Here is a great book for you: [Book Details]"
+
+### 4. Testing the Bot and API
+
+* Ensure that the server is running and connected to MongoDB.
+* Use the client application to add, view, edit, and delete templates.
+* Interact with the Telegram bot to retrieve templates based on context.
+* Verify that templates are correctly returned and managed.
+
 ## 🐳 Docker Setup
 
 ### 1. Create Environment File
