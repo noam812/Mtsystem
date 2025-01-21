@@ -3,6 +3,11 @@ import axios from "axios";
 
 const TemplateContext = createContext();
 
+const API_URL =
+  process.env.NODE_ENV === "production"
+    ? window.location.hostname
+    : "http://localhost:5000";
+
 export const TemplateProvider = ({ children }) => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +15,7 @@ export const TemplateProvider = ({ children }) => {
 
   const fetchTemplates = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/templates");
+      const response = await axios.get(`${API_URL}/api/templates`);
       setTemplates(response.data);
       setError(null);
     } catch (err) {
@@ -23,7 +28,7 @@ export const TemplateProvider = ({ children }) => {
   const addTemplate = useCallback(async (templateData) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/templates",
+        `${API_URL}/api/templates`,
         templateData
       );
       setTemplates((prev) => [...prev, response.data]);
@@ -36,7 +41,7 @@ export const TemplateProvider = ({ children }) => {
   const updateTemplate = useCallback(async (id, updates) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/templates/${id}`,
+        `${API_URL}/api/templates/${id}`,
         updates
       );
       setTemplates((prev) =>
@@ -50,7 +55,7 @@ export const TemplateProvider = ({ children }) => {
 
   const deleteTemplate = useCallback(async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/templates/${id}`);
+      await axios.delete(`${API_URL}/api/templates/${id}`);
       setTemplates((prev) => prev.filter((t) => t._id !== id));
     } catch (error) {
       throw error;
