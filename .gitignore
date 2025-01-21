@@ -33,3 +33,7 @@ yarn-error.log*
 
 # Production
 /build
+
+# Docker
+.docker
+docker-compose.override.yml
