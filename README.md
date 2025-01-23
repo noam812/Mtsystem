@@ -45,7 +45,7 @@ Create a [.env](vscode-file://vscode-app/c:/Users/Noam8/AppData/Local/Programs/M
 ### 3. Install Dependencies
 
 ```
-span
+npm install
 ```
 
 ### 4. Run Development Servers
